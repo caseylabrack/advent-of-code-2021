@@ -1,13 +1,11 @@
 depths = {}
-
 for line in io.lines("input.txt") do
   table.insert(depths, line + 0.0)
 end
 
 groups = {}
 for i=1, #depths-2 do
-  sum = depths[i] + depths[i+1] + depths[i+2]
-  table.insert(groups, sum)
+  table.insert(groups, depths[i] + depths[i+1] + depths[i+2])
 end
 
 increased = 0
