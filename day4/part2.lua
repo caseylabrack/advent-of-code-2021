@@ -1,13 +1,12 @@
 data  = assert(io.open("input.txt", "r"))
 
-drawsRaw = data:read("l") -- read a line. file seek point moved up
+drawsRaw = data:read("l") -- read a line. file seek point moved up one
 
 -- parse remaining lines into bingo boards
 boards = {}
-b = {}
 for line in data:lines() do
   if line =="" then
-    b = {}
+    b = {} -- empty line means start new bingo board
     table.insert(boards, b)
   else
     row = {}
@@ -18,18 +17,15 @@ for line in data:lines() do
   end
 end
 
--- string of string into array
+-- string of numbers into array
 draws = {}
 for d in drawsRaw:gmatch("%d+") do
   draws[#draws+1] = d
 end
 
-bingo = math.huge
-antiwinner = {}
-boardspool = table.move(boards, 1, #boards, 1, boardspool) -- clone boards
-for _, num in ipairs(draws) do
+for _, num in ipairs(draws) do -- draw a number
 
-  for _, board in ipairs(boardspool) do -- mark xs
+  for _, board in ipairs(boards) do -- for each board, mark xs
     for _, row in ipairs(board) do
       for i=1,5 do
         if row[i] == num then row[i] = "x" end
@@ -37,50 +33,46 @@ for _, num in ipairs(draws) do
     end
   end
 
-  for idx, board in ipairs(boardspool) do -- scan for winnner rowwise
-    for _, row in ipairs(board) do
+  for idx, board in ipairs(boards) do -- for each board
+
+    for _, row in ipairs(board) do -- scan rowwise for win
       xs = 0
       for i=1,5 do
         if row[i] == "x" then xs = xs + 1 end
       end
       if xs == 5 then
-        if #boardspool == 1 then
+        if #boards == 1 then
           bingo = num
           antiwinner = board
           goto bingo
         else
-          table.remove(boardspool, idx)
-          -- print(#boardspool)
-          goto next
+          table.remove(boards, idx)
+          goto continuescan
         end
       end
     end
-  end
 
-  for idx, board in ipairs(boardspool) do -- scan for winner colwise
-    for i=1,5 do
+    for i=1,5 do -- scan columnwise for win
       xs = 0
       for _, row in ipairs(board) do
         if row[i] == "x" then xs = xs + 1 end
       end
       if xs == 5 then
-        if #boardspool == 1 then
+        if #boards == 1 then
           bingo = num
           antiwinner = board
           goto bingo
         else
-          table.remove(boardspool, idx)
-          -- print(#boardspool)
-          goto next
+          table.remove(boards, idx)
+          goto continuescan
         end
       end
     end
+    ::continuescan:: -- used as multilevel `continue` statement
   end
-  ::next::
-  print(num, #boardspool)
 end
 
-::bingo::
+::bingo:: -- used as multilevel `break` statement
 sum = 0
 for _, row in ipairs(antiwinner) do
   for i=1,5 do
@@ -88,7 +80,6 @@ for _, row in ipairs(antiwinner) do
   end
 end
 
-print(bingo)
--- print(string.format("last win on %d", bingo))
--- print(string.format("score for that board: %d", sum))
--- print(string.format("multiplied: %d", sum * bingo))
+print(string.format("last win on %d", bingo))
+print(string.format("score for that board: %d", sum))
+print(string.format("multiplied: %d", sum * bingo))
