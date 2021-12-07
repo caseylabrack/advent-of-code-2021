@@ -12,14 +12,25 @@ for _, crab in ipairs(crabs) do
   if max < crab then max = crab end
 end
 
+-- optimization: memoize the get fuel function
+results = {}
+function getfuel (n)
+  local r = results[n]
+  if r == nil then
+    r = 0
+    for i=1,n do
+      r = r + i
+    end
+    results[n] = r
+  end
+  return r
+end
+
 fuel = {}
 for i=0,max do
   fuel[i] = 0
   for _, crab in ipairs(crabs) do
-    local dist = math.abs(i - crab)
-    for j=1,dist do
-      fuel[i] = fuel[i] + j
-    end
+    fuel[i] = fuel[i] + getfuel(math.abs(i - crab))
   end
 end
 
