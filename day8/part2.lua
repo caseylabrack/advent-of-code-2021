@@ -150,6 +150,14 @@ numbers[5] = stringSort(sectors[1] .. sectors[2] .. sectors[4] .. sectors[6] .. 
 numbers[6] = stringSort(sectors[1] .. sectors[2] .. sectors[4] .. sectors[5] .. sectors[6] .. sectors[7])
 numbers[9] = stringSort(sectors[1] .. sectors[2] .. sectors[3] .. sectors[4] .. sectors[6] .. sectors[7])
 
+output = ""
 for code in string.gmatch(entries[1].output, "[a-g]+") do
-  print(numbers[stringSort(code)])
+  for idx, key in ipairs(numbers) do
+    -- print(key, code)
+    if key == stringSort(code) then
+      output = output .. idx
+      break
+    end
+  end
 end
+print(output)
