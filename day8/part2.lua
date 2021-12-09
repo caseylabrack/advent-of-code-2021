@@ -61,7 +61,7 @@ function decode (ent)
     -- find number 6
     -- number six doesn't have both sectors used by number 1
   for _, code in ipairs(lengthsix) do
-    if string.match(code, numbers[1]) == nil then
+    if (string.match(code, string.sub(numbers[1],1,1)) == nil or string.match(code, string.sub(numbers[1],2,2)) == nil) then
       numbers[6] = code
     end
   end
@@ -85,9 +85,9 @@ function decode (ent)
     end
   end
     -- find number 3
-    -- number 3 doesn't have both sectors used by number 1
+    -- number 3 has both sectors used by number 1
   for _, code in ipairs(lengthfive) do
-    if string.match(code, string.sub(numbers[1],1,1)) ~= nil and string.match(code, string.sub(numbers[1],2,2)) then
+    if string.match(code, string.sub(numbers[1],1,1)) ~= nil and string.match(code, string.sub(numbers[1],2,2)) ~= nil then
       numbers[3] = code
     end
   end
@@ -108,9 +108,7 @@ function decode (ent)
     if unknownsectors[1] == letter then
       sectors[4] = letter
       sectors[7] = unknownsectors[2]
-      break
-    end
-    if unknownsectors[2] == letter then
+    elseif unknownsectors[2] == letter then
       sectors[4] = letter
       sectors[7] = unknownsectors[1]
     end
@@ -119,7 +117,7 @@ function decode (ent)
   -- find sector 2
     -- find the unknown sector in number 4
   knownsectorsInFourTable = stringToTable(stringSort(sectors[3] .. sectors[4] .. sectors[6]))
-  local four = numbers[4]
+  four = numbers[4]
   for _, sector in ipairs(knownsectorsInFourTable) do
     four = string.gsub(four, sector, "")
   end
@@ -143,8 +141,7 @@ function decode (ent)
 
   output = ""
   for code in string.gmatch(ent.output, "[a-g]+") do
-    for idx, key in ipairs(numbers) do
-      -- print(key, code)
+    for idx, key in pairs(numbers) do
       if key == stringSort(code) then
         output = output .. idx
         break
@@ -164,7 +161,6 @@ end
 
 sum = 0
 for idx, entry in ipairs(entries) do
-  print(idx)
   sum = sum + decode(entry)
 end
 print(sum)
