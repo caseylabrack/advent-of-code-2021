@@ -20,9 +20,14 @@ function stringSort (str)
   return table.concat(t)
 end
 
-function decode (ent)
+sum = 0
+for entry in io.lines("input.txt") do
+
+  alldigits = string.match(entry, "([a-g ]+)%s|") -- first part
+  out = string.match(entry, "|%s([a-g ]+)") -- second part
+
   digits = {}
-  for digit in string.gmatch(ent.alldigits, "[a-g]+") do
+  for digit in string.gmatch(alldigits, "[a-g]+") do
     table.insert(digits, stringSort(digit))
   end
 
@@ -39,6 +44,7 @@ function decode (ent)
   numbers[8] = digits[10]
   -- numbers[9] = ???
 
+  -- the seven sectors of the display
   sectors = {}
 
   -- find sector 1
@@ -139,8 +145,9 @@ function decode (ent)
   numbers[6] = stringSort(sectors[1] .. sectors[2] .. sectors[4] .. sectors[5] .. sectors[6] .. sectors[7])
   numbers[9] = stringSort(sectors[1] .. sectors[2] .. sectors[3] .. sectors[4] .. sectors[6] .. sectors[7])
 
+  -- decode
   output = ""
-  for code in string.gmatch(ent.output, "[a-g]+") do
+  for code in string.gmatch(out, "[a-g]+") do
     for idx, key in pairs(numbers) do
       if key == stringSort(code) then
         output = output .. idx
@@ -148,19 +155,7 @@ function decode (ent)
       end
     end
   end
-  return tonumber(output)
+  sum = sum + tonumber(output)
 end
 
-entries = {}
-for line in io.lines("input.txt") do
-  local entry = {}
-  entry.alldigits = string.match(line, "([a-g ]+)%s|")
-  entry.output = string.match(line, "|%s([a-g ]+)")
-  table.insert(entries, entry)
-end
-
-sum = 0
-for idx, entry in ipairs(entries) do
-  sum = sum + decode(entry)
-end
 print(sum)
