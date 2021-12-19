@@ -55,25 +55,3 @@ end
 print(mostFreqChar, mostFreqNum)
 print(leastFreqChar, leastFreqNum)
 print(mostFreqNum - leastFreqNum)
-
--- for i=1,1 do
---   matches = {}
---   for key, value in pairs(rules) do
---     local idx = string.find(template, key)
---     if idx ~= nil then
---       table.insert(matches, {match = key, index = idx})
---     end
---   end
---
---   table.sort(matches, function (a,b) return a.index < b.index end)
---
---   pos = 1
---   newtemp = template
---   for _, match in ipairs(matches) do
---     print(match.match, match.index)
---     local swapwith = string.sub(match,1,1) .. rules[match] .. string.sub(match,2,2)
---     newtemp = string.gsub(newtemp, match, swapwith, pos)
---   end
---   template = newtemp
---   print(template)
--- end

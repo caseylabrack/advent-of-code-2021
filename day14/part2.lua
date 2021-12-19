@@ -3,59 +3,58 @@ data  = assert(io.open("input.txt", "r"))
 template = data:read("l")
 data:read("l") -- blank line
 
+-- table of insertion rules
+-- key = insertion pair, value = char to insert
 rules = {}
 for line in data:lines() do
   local pair, ins = string.match(line, "^(%a%a).*(%a)")
   rules[pair] = ins
 end
 
-head = {}
-head.prev = nil
-head.value = string.sub(template, 1, 1)
-
-last = head
-for i=2,string.len(template) do
-  local current = {}
-  current.prev = last
-  current.value = string.sub(template,i,i)
-  last.next = current
-  last = current
+-- parse template into list of insertion pairs
+chempairs = {}
+for i=1,string.len(template)-1 do
+  local key = string.sub(template,i,i) .. string.sub(template,i+1,i+1)
+  chempairs[key] = 1 + (chempairs[key] or 0)
 end
 
-for i=1,25 do
-  pointer = head
-  while pointer.next ~= nil do
-    local chunk = pointer.value .. pointer.next.value
-    -- print("chunk" .. chunk)
-    if rules[chunk] ~= nil then
-      local insert = {}
-      insert.value = rules[chunk]
-      insert.next = pointer.next
-      insert.prev = pointer
+-- table to hold letter counts
+-- initialize with template letters
+letters = {}
+for char in string.gmatch(template, "%w") do
+  letters[char] = 1 + (letters[char] or 0)
+end
 
-      pointer.next = insert
-      pointer = insert.next
-    else
-      pointer = pointer.next
-    end
+-- every iteration, every chempair spawns two chempairs
+-- and adds a letter
+for i=1,40 do
+  newchempairs = {}
+  for key, value in pairs(chempairs) do
+    local t1 = string.sub(key, 1, 1) .. rules[key]
+    local t2 = rules[key] .. string.sub(key, 2, 2)
+    newchempairs[t1] = value + (newchempairs[t1] or 0)
+    newchempairs[t2] = value + (newchempairs[t2] or 0)
+    letters[rules[key]] = value + (letters[rules[key]] or 0)
+  end
+  chempairs = newchempairs
+end
+
+-- find most and least frequent letters
+maxLetterNum = -math.huge
+maxLetterChar = ""
+minLetterNum = math.huge
+minLetterChar = ""
+for char, occurences in pairs(letters) do
+  if occurences > maxLetterNum then
+    maxLetterNum = occurences
+    maxLetterChar = char
+  end
+  if occurences < minLetterNum then
+    minLetterNum = occurences
+    minLetterChar = char
   end
 end
 
--- debug zone
-pointer = head
-sum = 0
-while pointer.next ~= nil do
-  sum = sum + 1
-  pointer = pointer.next
-end
-print(sum)
-
-
-
--- debug zone
--- pointer = head
--- while pointer.next ~= nil do
---   io.write(pointer.value)
---   pointer = pointer.next
--- end
--- io.write("\n")
+print("min letter", minLetterChar, minLetterNum)
+print("max letter", maxLetterChar, maxLetterNum)
+print("difference", maxLetterNum - minLetterNum)
